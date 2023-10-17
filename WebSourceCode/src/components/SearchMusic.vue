@@ -162,6 +162,15 @@ function getFileTypeAndSize(
 
 const paddingHeadHeight = ref(0);
 
+const screenWidth = ref(0);
+
+const isMobile = () => {
+  if(screenWidth.value < 768){
+    return true;
+  } else {
+    return false;
+  }
+}
 
 
 onMounted(() => {
@@ -176,6 +185,10 @@ onMounted(() => {
     paddingHeadHeight.value = headRef.value.clientHeight
 
   }
+  screenWidth.value = window.innerWidth
+  window.addEventListener('resize', () => {
+    screenWidth.value = window.innerWidth
+  });
 
   // console.log(headRef.value);
   // const h = headRef.value as HTMLDivElement;
@@ -245,6 +258,21 @@ const handleSearch = () => {
   search();
 };
 
+const handleSingerClick = (name: string) => {
+  basicStore.lastSearch = name
+  handleSearch();
+}
+
+const handleSongClick = (name: string) => {
+  basicStore.lastSearch = name
+  handleSearch();
+}
+
+const handleAlbumClick = (name: string) => {
+  basicStore.lastSearch = "b:" + name;
+  handleSearch();
+}
+
 const downloadAllPage = function () {
   ElNotification({
     title: '功能还没做捏',
@@ -260,7 +288,19 @@ const downloadAllPage = function () {
     <div ref="headRef" class="head-section">
       <div class="top-tip">搜索</div>
       <div class="area-top">
-        <el-input v-model="basicStore.lastSearch" placeholder="请输入关键词搜索" class="input-with-select"
+        <div v-if="isMobile()">
+          <el-select v-model="basicStore.config.platform" placeholder="请选择接口" style="width: 120px">
+              <el-option v-for="it in platformList" :label="it.name" :value="it.value" />
+          </el-select>
+          <el-input v-model="basicStore.lastSearch" placeholder="请输入关键词搜索" class="input-with-select"
+            @keyup.enter="handleSearch">
+            <template #append>
+              <el-button :icon="Search" @click="handleSearch" />
+            </template>
+          </el-input>
+        </div>
+        <div v-else class="input-with-select" style="width: 100%;">
+          <el-input v-model="basicStore.lastSearch" placeholder="请输入关键词搜索" class="input-with-select"
           @keyup.enter="handleSearch">
           <template #prepend>
             <el-select v-model="basicStore.config.platform" placeholder="请选择接口" style="width: 120px">
@@ -271,6 +311,7 @@ const downloadAllPage = function () {
             <el-button :icon="Search" @click="handleSearch" />
           </template>
         </el-input>
+        </div>
         <div class="options">
           <el-checkbox v-model="basicStore.config.onlyMatchSearchKey" label="仅显示搜索的歌手歌曲" />
           <el-checkbox v-model="basicStore.config.disableFilterKey" label="不使用关键词过滤歌曲" />
@@ -330,18 +371,29 @@ const downloadAllPage = function () {
                   <div class="flac-tip" v-if="scope.row.extra === 'flac'">
                     无损
                   </div>
-                  <div class="name">{{ scope.row.title }}</div>
+                  <el-button link type="primary" size="large" @click="handleSongClick(scope.row.title)">{{ scope.row.title }}
+                  </el-button>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column :show-overflow-tooltip="true" :formatter="getSinger" prop="singer.name" label="艺术家"
-              width="200" />
-            <el-table-column :show-overflow-tooltip="true" prop="album" label="专辑" width="200" />
+            <el-table-column :show-overflow-tooltip="true" prop="singer" label="艺术家"
+              width="200">
+              <template #default="scope">
+                <el-button link type="primary" size="default" @click="handleSingerClick(scope.row.singer)">{{ scope.row.singer }}
+                </el-button>
+              </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" prop="album" label="专辑" width="200">
+              <template #default="scope">
+                <el-button link type="primary" size="large" @click="handleAlbumClick(scope.row.albumMid)">{{ scope.row.album }}
+                </el-button>
+              </template>
+            </el-table-column>
             <el-table-column :formatter="getFileTypeAndSize" :show-overflow-tooltip="true" prop="notice" label="品质"
               width="250" />
             <el-table-column fixed="right" label="操作">
               <template #default="scope">
-                <el-button link type="primary" size="small" @click="handleDown(scope.row)">下载
+                <el-button link type="primary" size="large" @click="handleDown(scope.row)">下载
                 </el-button>
                 <!--                <el-button link type="primary" size="small">试听</el-button>-->
               </template>

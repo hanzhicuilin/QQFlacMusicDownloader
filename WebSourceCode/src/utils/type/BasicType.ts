@@ -16,7 +16,8 @@ export interface SearchMusicResultSingle {
     size: number
     songmid: string
     time_publish: string
-    title: string
+    title: string,
+    albumMid:string,
 }
 
 export interface Page {
