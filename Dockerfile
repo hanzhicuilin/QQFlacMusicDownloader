@@ -1,16 +1,7 @@
-FROM python:3.11-slim-buster
+FROM registry.cn-hangzhou.aliyuncs.com/music_downloader/qq_flac_music_downloader:latest
 
 LABEL name="QQFlacMusicDownloader"
 
-ENV TZ Asia/Shanghai
-# Keeps Python from generating .pyc files in the container
-ENV PYTHONDONTWRITEBYTECODE=1
-# Turns off buffering for easier container logging
-ENV PYTHONUNBUFFERED=1
-
-RUN     apt-get update && apt-get install -y \
-        gcc g++ libjpeg-dev zlib1g-dev \
-        && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
 
