@@ -123,7 +123,7 @@ def handleQQ(music, musicFileInfo):
     sourceSelect = "hr" if music['prefix'] == "RS01" else "sq" if music['prefix'] == "F000" else \
         "hq" if music['prefix'] == "M800" else "mp3"
 
-    link = QQApi.getQQMusicDownloadLinkByTrdServer(songmid, sourceSelect)
+    link = music['downloadUrl']
     if link.find('stream.qqmusic.qq.com') == -1:
         print(f"无法加载资源文件！解析歌曲下载地址失败！{musicFileInfo}，错误细节:" + link)
         link = None
